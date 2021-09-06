@@ -9,18 +9,27 @@
 
         $( "#btnDownload" ).click(function() {
   		
+			var inputJsonFileLocation = $("#inputJsonFileLocation").val();
 			var inputJson = $("#inputJson").val();					
-			var jsonObj = jQuery.parseJSON(inputJson);
-			if(!isValidJson(jsonObj)){
-					alert("Invalid Json"); 
-			}
-			else{
-					var fromatedObj = formatJson(jsonObj);
-					console.log(fromatedObj);
-					
-					exportCSVFile(fromatedObj.issues,"Data");
-			}
 
+			if(inputJsonFileLocation != ""){
+				var request = new XMLHttpRequest();
+				request.open("GET",inputJsonFileLocation, false);
+				request.send(null)
+				var my_JSON_object = JSON.parse(request.responseText);
+				var fromatedObj = formatJson(my_JSON_object);						
+				exportCSVFile(fromatedObj.issues,"Data");
+				
+			}else{
+					var jsonObj = jQuery.parseJSON(inputJson);
+				if(!isValidJson(jsonObj)){
+						alert("Invalid Json"); 
+				}
+				else{
+						var fromatedObj = formatJson(jsonObj);						
+						exportCSVFile(fromatedObj.issues,"Data");
+				}
+			}
 
 		});
     });
@@ -59,6 +68,8 @@
 		}
 		return fromatedObj;
 	}
+
+
 
 	function removeCommas(str){
 		return str.replace(",", " ");
@@ -135,11 +146,13 @@
 	<table>
 		<tr>
 			<td>Step 1: Get the json from the jira instance</td>
-			<td><a href="https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=30347&expand=changelog&maxResults=150" target="_blank">Get the jira data</a></td>
+			<td><a href="https://jiraserver.com/rest/api/latest/search?jql=filter=30347&expand=changelog&maxResults=150" target="_blank">Get the jira data</a></td>
 		</tr>
 		<tr>
 			<td>Step 2: Fill in the json</td>
 			<td><textarea id="inputJson" maxlength="16000000"></textarea></td>
+			<td>Or give the link to the json file for large files</td>
+			<td><textarea id="inputJsonFileLocation"></textarea></td>
 		</tr>
 		<tr>
 			<td>Step 3: Get the csv formated for analytics.actionableagile.com</td>
