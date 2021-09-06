@@ -6,7 +6,6 @@
 
     $( document ).ready(function() {
         console.log( "document loaded" );
-        var linkTicketsProductTeams = "https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=28623&expand=changelog&maxResults=150";
 
         $( "#btnDownload" ).click(function() {
   		
@@ -25,13 +24,10 @@
 
 		});
     });
- 
-    $( window ).on( "load", function() {
-        console.log( "window loaded" );
-        
-    });
 
 	function formatJson(jsonObj){
+		//this is the place to setup the workflow
+		//it should start with Id, Name, statuses of the issue, Done and Type
 		var skeletonJSON = '{"issues":[{"Id":"Id","Name":"Name", "StartDate":"Analysis in progress","DevStarted":"Dev in progress","WaitingForCodeReview":"Waiting for code review","CodeReviewInProgress":"Code review in progress", "DoneDate":"Done", "Type":"Type" }]}';
 		var fromatedObj = JSON.parse(skeletonJSON); 
 		for (var i = 0; i < jsonObj.issues.length; i++){
@@ -46,10 +42,10 @@
 			var codeReviewInProgress = getDateByStatus(histories,"Code Review In Progress");
 			var endDate = getDateByStatus(histories,"Dev Done");
 			
+			//hacks for having done dates
 			if(endDate == ""){
 				endDate = getDateByStatus(histories,"Waiting for Release");
 			}
-			
 			if(endDate == ""){
 				endDate = getDateByStatus(histories,"Done");
 			}
