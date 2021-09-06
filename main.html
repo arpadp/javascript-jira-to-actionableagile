@@ -51,15 +51,8 @@
 				endDate = getDateByStatus(histories,"Done");
 			}
 			
+			//Need to have dates on the first columns. 
 			if(startDate != "" || devStarted != "") {
-				//Need to have dates on the first columns. 
-				if(startDate == ""){
-					startDate = devStarted;
-				}
-				if(devStarted == ""){
-					devStarted = startDate;
-				}
-
 				fromatedObj['issues'].push({"Id":jsonObj.issues[i].key,"Name":summary,"StartDate":startDate,"WaitingForDev":waitingForDev,"DevStarted":devStarted,"WaitingForCodeReview":waitingForCodeReview,"CodeReviewInProgress":codeReviewInProgress,"DoneDate":endDate, "Type":type});
 			}
 			
@@ -142,7 +135,7 @@
 	<table>
 		<tr>
 			<td>Step 1: Get the json from the jira instance</td>
-			<td><a href="https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=30347&expand=changelog&maxResults=150" target="_blank">Get the data for all product teams</a></td>
+			<td><a href="https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=30347&expand=changelog&maxResults=150" target="_blank">Get the jira data</a></td>
 		</tr>
 		<tr>
 			<td>Step 2: Fill in the json</td>
