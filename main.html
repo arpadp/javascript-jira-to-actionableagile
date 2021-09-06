@@ -41,6 +41,11 @@
 			var waitingForCodeReview = getDateByStatus(histories,"Waiting for Code Review");
 			var codeReviewInProgress = getDateByStatus(histories,"Code Review In Progress");
 			var endDate = getDateByStatus(histories,"Dev Done");
+			
+			if(endDate == ""){
+				endDate = getDateByStatus(histories,"Waiting for Release");
+			}
+			
 			if(endDate == ""){
 				endDate = getDateByStatus(histories,"Done");
 			}
