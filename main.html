@@ -17,8 +17,8 @@
 				var request = new XMLHttpRequest();
 				request.open("GET",inputJsonFileLocation, false);
 				request.send(null)
-				var my_JSON_object = JSON.parse(request.responseText);
-				var fromatedObj = formatJson(my_JSON_object);						
+				var linkJsonObj = JSON.parse(request.responseText);
+				var fromatedObj = formatJson(linkJsonObj);						
 				exportCSVFile(fromatedObj.issues,"Data");
 				
 			}else{
@@ -36,8 +36,6 @@
     });
 
 	function formatJson(jsonObj){
-		//this is the place to setup the workflow
-		//it should start with Id, Name, statuses of the issue, Done and Type
 		
 		var fromatedObj = JSON.parse(skeletonJSON); 
 		for (var i = 0; i < jsonObj.issues.length; i++){
