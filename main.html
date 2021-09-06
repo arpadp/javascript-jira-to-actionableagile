@@ -6,7 +6,7 @@
 
     $( document ).ready(function() {
         console.log( "document loaded" );
-        var linkTicketsProductTeams = "https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=28623&expand=changelog&maxResults=100";
+        var linkTicketsProductTeams = "https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=28623&expand=changelog&maxResults=150";
 
         $( "#btnDownload" ).click(function() {
   		
@@ -32,7 +32,7 @@
     });
 
 	function formatJson(jsonObj){
-		var skeletonJSON = '{"issues":[{"Id":"Id", "StartDate":"Analysis in progress","DevStarted":"Dev in progress","WaitingForCodeReview":"Waiting for code review","CodeReviewInProgress":"Code review in progress", "DoneDate":"Done" }]}';
+		var skeletonJSON = '{"issues":[{"Id":"Id","Name":"Name", "StartDate":"Analysis in progress","DevStarted":"Dev in progress","WaitingForCodeReview":"Waiting for code review","CodeReviewInProgress":"Code review in progress", "DoneDate":"Done" }]}';
 		var fromatedObj = JSON.parse(skeletonJSON); 
 		for (var i = 0; i < jsonObj.issues.length; i++){
 			var histories = jsonObj.issues[i].changelog.histories;
@@ -54,7 +54,7 @@
 					devStarted = startDate;
 				}
 
-				fromatedObj['issues'].push({"Id":jsonObj.issues[i].key,"StartDate":startDate,"DevStarted":devStarted,"WaitingForCodeReview":waitingForCodeReview,"CodeReviewInProgress":codeReviewInProgress,"DoneDate":endDate});
+				fromatedObj['issues'].push({"Id":jsonObj.issues[i].key,"Name":jsonObj.issues[i].fields.summary,"StartDate":startDate,"DevStarted":devStarted,"WaitingForCodeReview":waitingForCodeReview,"CodeReviewInProgress":codeReviewInProgress,"DoneDate":endDate});
 			}
 			
 		}
@@ -131,15 +131,15 @@
 <body>
 	<table>
 		<tr>
-			<td>Step 1: Get the json</td>
-			<td><a href="https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=28623&expand=changelog&maxResults=100" target="_blank">Get the data for all product teams</a></td>
+			<td>Step 1: Get the json from the jira instance</td>
+			<td><a href="https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=28623&expand=changelog&maxResults=150" target="_blank">Get the data for all product teams</a></td>
 		</tr>
 		<tr>
 			<td>Step 2: Fill in the json</td>
 			<td><textarea id="inputJson" maxlength="16000000"></textarea></td>
 		</tr>
 		<tr>
-			<td>Step 3: Get the csv</td>
+			<td>Step 3: Get the csv formated for analytics.actionableagile.com</td>
 			<td><button id="btnDownload">Click to download</button></td>
 		</tr>
 	</table>
