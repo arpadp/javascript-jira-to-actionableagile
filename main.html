@@ -1,0 +1,148 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script>
+
+
+    $( document ).ready(function() {
+        console.log( "document loaded" );
+        var linkTicketsProductTeams = "https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=28623&expand=changelog&maxResults=100";
+
+        $( "#btnDownload" ).click(function() {
+  		
+			var inputJson = $("#inputJson").val();					
+			var jsonObj = jQuery.parseJSON(inputJson);
+			if(!isValidJson(jsonObj)){
+					alert("Invalid Json"); 
+			}
+			else{
+					var fromatedObj = formatJson(jsonObj);
+					console.log(fromatedObj);
+					
+					exportCSVFile(fromatedObj.issues,"Data");
+			}
+
+
+		});
+    });
+ 
+    $( window ).on( "load", function() {
+        console.log( "window loaded" );
+        
+    });
+
+	function formatJson(jsonObj){
+		var skeletonJSON = '{"issues":[{"Id":"Id", "StartDate":"Analysis in progress","DevStarted":"Dev in progress","WaitingForCodeReview":"Waiting for code review","CodeReviewInProgress":"Code review in progress", "DoneDate":"Done" }]}';
+		var fromatedObj = JSON.parse(skeletonJSON); 
+		for (var i = 0; i < jsonObj.issues.length; i++){
+			var histories = jsonObj.issues[i].changelog.histories;
+			var startDate = getDateByStatus(histories,"Analysis In Progress");
+			var devStarted = getDateByStatus(histories,"Dev In Progress");
+			var waitingForCodeReview = getDateByStatus(histories,"Waiting for Code Review");
+			var codeReviewInProgress = getDateByStatus(histories,"Code Review In Progress");
+			var endDate = getDateByStatus(histories,"Dev Done");
+			if(endDate == ""){
+				endDate = getDateByStatus(histories,"Done");
+			}
+			
+			if(startDate != "" || devStarted != "") {
+				//Need to have dates on the first columns. 
+				if(startDate == ""){
+					startDate = devStarted;
+				}
+				if(devStarted == ""){
+					devStarted = startDate;
+				}
+
+				fromatedObj['issues'].push({"Id":jsonObj.issues[i].key,"StartDate":startDate,"DevStarted":devStarted,"WaitingForCodeReview":waitingForCodeReview,"CodeReviewInProgress":codeReviewInProgress,"DoneDate":endDate});
+			}
+			
+		}
+		return fromatedObj;
+	}
+
+	function getDateByStatus(histories, toStatus){
+		for (var j = 0; j < histories.length; j++){
+				if(histories[j].items[0].toString==toStatus){
+					return histories[j].created;
+				}
+			}
+		return "";	
+	}
+
+	function ConvertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str;
+    }
+
+	function exportCSVFile(jsonObject, fileTitle) {
+		
+		var csv = ConvertToCSV(jsonObject);
+
+		var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
+
+		var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		if (navigator.msSaveBlob) { // IE 10+
+			navigator.msSaveBlob(blob, exportedFilenmae);
+		} else {
+			var link = document.createElement("a");
+			if (link.download !== undefined) { // feature detection
+				// Browsers that support HTML5 download attribute
+				var url = URL.createObjectURL(blob);
+				link.setAttribute("href", url);
+				link.setAttribute("download", exportedFilenmae);
+				link.style.visibility = 'hidden';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
+		}
+	}
+
+
+    function isValidJson(jsonObj) {
+		try {
+		if(typeof jsonObj != 'undefined' && typeof jsonObj.issues != 'undefined' && typeof jsonObj.issues[0].key != 'undefined' && jsonObj.issues[0].key.startsWith("HOP-")){
+			return true;
+		}
+		return false;
+		}
+		catch{
+			return false;
+		}
+
+	}
+
+    </script>
+</head>
+<body>
+	<table>
+		<tr>
+			<td>Step 1: Get the json</td>
+			<td><a href="https://jira.corp.zscaler.com/rest/api/latest/search?jql=filter=28623&expand=changelog&maxResults=100" target="_blank">Get the data for all product teams</a></td>
+		</tr>
+		<tr>
+			<td>Step 2: Fill in the json</td>
+			<td><textarea id="inputJson" maxlength="16000000"></textarea></td>
+		</tr>
+		<tr>
+			<td>Step 3: Get the csv</td>
+			<td><button id="btnDownload">Click to download</button></td>
+		</tr>
+	</table>
+	
+</body>
+</html>
