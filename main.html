@@ -32,10 +32,14 @@
     });
 
 	function formatJson(jsonObj){
-		var skeletonJSON = '{"issues":[{"Id":"Id","Name":"Name", "StartDate":"Analysis in progress","DevStarted":"Dev in progress","WaitingForCodeReview":"Waiting for code review","CodeReviewInProgress":"Code review in progress", "DoneDate":"Done" }]}';
+		var skeletonJSON = '{"issues":[{"Id":"Id","Name":"Name", "StartDate":"Analysis in progress","DevStarted":"Dev in progress","WaitingForCodeReview":"Waiting for code review","CodeReviewInProgress":"Code review in progress", "DoneDate":"Done", "Type":"Type" }]}';
 		var fromatedObj = JSON.parse(skeletonJSON); 
 		for (var i = 0; i < jsonObj.issues.length; i++){
 			var histories = jsonObj.issues[i].changelog.histories;
+			
+			var summary = removeCommas(jsonObj.issues[i].fields.summary);
+			var type = removeCommas(jsonObj.issues[i].fields.issuetype.name);
+			
 			var startDate = getDateByStatus(histories,"Analysis In Progress");
 			var devStarted = getDateByStatus(histories,"Dev In Progress");
 			var waitingForCodeReview = getDateByStatus(histories,"Waiting for Code Review");
@@ -59,11 +63,15 @@
 					devStarted = startDate;
 				}
 
-				fromatedObj['issues'].push({"Id":jsonObj.issues[i].key,"Name":jsonObj.issues[i].fields.summary,"StartDate":startDate,"DevStarted":devStarted,"WaitingForCodeReview":waitingForCodeReview,"CodeReviewInProgress":codeReviewInProgress,"DoneDate":endDate});
+				fromatedObj['issues'].push({"Id":jsonObj.issues[i].key,"Name":summary,"StartDate":startDate,"DevStarted":devStarted,"WaitingForCodeReview":waitingForCodeReview,"CodeReviewInProgress":codeReviewInProgress,"DoneDate":endDate, "Type":type});
 			}
 			
 		}
 		return fromatedObj;
+	}
+
+	function removeCommas(str){
+		return str.replace(",", " ");
 	}
 
 	function getDateByStatus(histories, toStatus){
