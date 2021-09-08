@@ -15,8 +15,7 @@
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script>
 
-	//Change this to match the workflow from jira. Note that the strings should be the exact statuses from jira
-	//const worklfowSteps = ['Analysis in progress','Waiting for Dev','Dev In Progress','Waiting for Code Review','Code Review In Progress','Dev Done'];
+	
 	var worklfowSteps = [];
 	//Some teams may use dev done status as end date, but people may push directly to done. This helps to have these stories closed as well.
 	const overrideDevDoneDateWithDevDateWhenDevDoneDateIsNull = true;
