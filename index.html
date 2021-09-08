@@ -199,7 +199,7 @@
 
     function isValidJiraJson(jsonObj) {
 		try {
-		if(typeof jsonObj != 'undefined' && typeof jsonObj.issues != 'undefined' && typeof jsonObj.issues[0].key != 'undefined' && jsonObj.issues[0].key.startsWith("HOP-")){
+		if(typeof jsonObj != 'undefined' && typeof jsonObj.issues != 'undefined' && typeof jsonObj.issues[0].key != 'undefined'){
 			return true;
 		}
 		return false;
