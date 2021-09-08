@@ -1,10 +1,23 @@
 <html>
 <head>
+	<style type="text/css">
+		textarea {
+			border : 1 black;
+			overflow: hidden;
+			padding: 0;
+			outline: none;
+			background-color: rgba(231, 192, 19, 0.692);
+			resize: none;
+			width: 400px;
+			height: 100px;
+		}
+		</style>
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script>
 
 	//Change this to match the workflow from jira. Note that the strings should be the exact statuses from jira
-	const worklfowSteps = ['Analysis in progress','Waiting for Dev','Dev In Progress','Waiting for Code Review','Code Review In Progress','Dev Done'];
+	//const worklfowSteps = ['Analysis in progress','Waiting for Dev','Dev In Progress','Waiting for Code Review','Code Review In Progress','Dev Done'];
+	var worklfowSteps = [];
 	//Some teams may use dev done status as end date, but people may push directly to done. This helps to have these stories closed as well.
 	const overrideDevDoneDateWithDevDateWhenDevDoneDateIsNull = true;
 
@@ -14,7 +27,8 @@
         $( "#btnDownload" ).click(function() {
   		
 			var inputJsonFileLocation = $("#inputJsonFileLocation").val();
-			var inputJson = $("#inputJson").val();					
+			var inputJson = $("#inputJson").val();	
+			getWorkflowSteps();			
 
 			if(inputJsonFileLocation != ""){
 				var request = new XMLHttpRequest();
@@ -37,6 +51,11 @@
 
 		});
     });
+
+	function getWorkflowSteps(){
+		var inputWorkflow = $("#inputWorkflow").val();	
+		worklfowSteps = inputWorkflow.split(',');
+	}
 
 	function formatJson(jsonObj){
 		
@@ -187,17 +206,21 @@
 <body>
 	<table>
 		<tr>
-			<td>Step 1: Get the json from the jira instance</td>
+			<td>Step 1: Setup the jira workflow. These must be the exact statuses from jira sperated by comma like on the default example</td>
+			<td><textarea id="inputWorkflow">Analysis in progress,Waiting for Dev,Dev In Progress,Waiting for Code Review,Code Review In Progress,Dev Done</textarea></td>
+		</tr>
+		<tr>
+			<td>Step 2: Get the json from the jira instance</td>
 			<td><a href="https://jiraserver.com/rest/api/latest/search?jql=filter=30347&expand=changelog&maxResults=150" target="_blank">Get the jira data</a></td>
 		</tr>
 		<tr>
-			<td>Step 2: Fill in the json</td>
+			<td>Step 3: Fill in the json</td>
 			<td><textarea id="inputJson" maxlength="16000000"></textarea></td>
 			<td>Or give the link to the json file for large files</td>
 			<td><textarea id="inputJsonFileLocation"></textarea></td>
 		</tr>
 		<tr>
-			<td>Step 3: Get the csv formated for analytics.actionableagile.com</td>
+			<td>Step 4: Get the csv formated for analytics.actionableagile.com</td>
 			<td><button id="btnDownload">Click to download</button></td>
 		</tr>
 	</table>
