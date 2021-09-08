@@ -16,34 +16,40 @@
     <script>
 
 	
-	var worklfowSteps = [];
+	
 	//Some teams may use dev done status as end date, but people may push directly to done. This helps to have these stories closed as well.
 	const overrideDevDoneDateWithDevDateWhenDevDoneDateIsNull = true;
 
     $( document ).ready(function() {
         console.log( "document loaded" );
+		runTests();
 
         $( "#btnDownload" ).click(function() {
   		
-			var inputJsonFileLocation = $("#inputJsonFileLocation").val();
+			var inputJsonLinkLocation = $("#inputJsonLinkLocation").val();
 			var inputJson = $("#inputJson").val();	
-			getWorkflowSteps();			
+			var inputWorkflow = $("#inputWorkflow").val();	
+			var worklfowSteps = getWorkflowSteps(inputWorkflow);	
+			
+			if(worklfowSteps == null){
+				alert("The workflow is not in the proper format!");
+			}
 
-			if(inputJsonFileLocation != ""){
+			if(inputJsonLinkLocation != ""){
 				var request = new XMLHttpRequest();
-				request.open("GET",inputJsonFileLocation, false);
+				request.open("GET",inputJsonLinkLocation, false);
 				request.send(null)
 				var linkJsonObj = JSON.parse(request.responseText);
-				var fromatedObj = formatJson(linkJsonObj);						
+				var fromatedObj = formatJson(linkJsonObj, worklfowSteps);						
 				exportCSVFile(fromatedObj.issues,"Data");
 				
 			}else{
-					var jsonObj = jQuery.parseJSON(inputJson);
-				if(!isValidJson(jsonObj)){
+				var jsonObj = jQuery.parseJSON(inputJson);
+				if(!isValidJiraJson(jsonObj)){
 						alert("Invalid Json"); 
 				}
 				else{
-						var fromatedObj = formatJson(jsonObj);						
+						var fromatedObj = formatJson(jsonObj, worklfowSteps);						
 						exportCSVFile(fromatedObj.issues,"Data");
 				}
 			}
@@ -51,12 +57,18 @@
 		});
     });
 
-	function getWorkflowSteps(){
-		var inputWorkflow = $("#inputWorkflow").val();	
-		worklfowSteps = inputWorkflow.split(',');
+	function getWorkflowSteps(inputWorkflow){
+		
+		if(inputWorkflow.includes(',')){
+			worklfowSteps = inputWorkflow.split(',');
+			return worklfowSteps;
+		}
+		else{
+			return null;
+		}
 	}
 
-	function formatJson(jsonObj){
+	function formatJson(jsonObj, worklfowSteps){
 		
 		var fromatedObj = JSON.parse(getSkeletonJsonFormated()); 
 		for (var i = 0; i < jsonObj.issues.length; i++){
@@ -119,7 +131,6 @@
 				}
 			}
 
-
 			
 		}
 
@@ -142,24 +153,6 @@
 			}
 		return "";	
 	}
-
-	function ConvertToCSV(objArray) {
-            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-            var str = '';
-
-            for (var i = 0; i < array.length; i++) {
-                var line = '';
-                for (var index in array[i]) {
-                    if (line != '') line += ','
-
-                    line += array[i][index];
-                }
-
-                str += line + '\r\n';
-            }
-
-            return str;
-    }
 
 	function exportCSVFile(jsonObject, fileTitle) {
 		
@@ -185,8 +178,26 @@
 		}
 	}
 
+	function ConvertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
 
-    function isValidJson(jsonObj) {
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str;
+    }
+
+
+    function isValidJiraJson(jsonObj) {
 		try {
 		if(typeof jsonObj != 'undefined' && typeof jsonObj.issues != 'undefined' && typeof jsonObj.issues[0].key != 'undefined' && jsonObj.issues[0].key.startsWith("HOP-")){
 			return true;
@@ -197,6 +208,72 @@
 			return false;
 		}
 
+	}
+
+	function runTests(){
+		var result = true;
+		if(!testOKGetWorkflowSteps()){
+			alert("getWorkflowStepsTestOk failed");
+			result = false;
+		}
+		if(!testShouldFailGetWorkflowSteps()){
+			alert("getWorkflowStepsShouldFail failed");
+			result = false;
+		}
+		if(!testShouldFailIsValidJson()){
+			alert("isValidJsonTestOK failed");
+			result = false;
+		}
+		if(!testConvertToCSVOK()){
+			alert("testConvertToCSVOK failed");
+			result = false;
+		}
+		if(result){
+			console.log("All tests passed");
+		}
+		
+	}
+
+	function testOKGetWorkflowSteps(){
+		var inputStr = "a,b"
+		var result = getWorkflowSteps(inputStr);
+
+		if(result.length == 2){
+			return true;
+		}
+		return false;
+	}
+
+	function testShouldFailGetWorkflowSteps(){
+		var inputStr = "ab"
+		var result = getWorkflowSteps(inputStr);
+
+		if(result == null){
+			return true;
+		}
+		return false;
+
+	}
+
+	function testShouldFailIsValidJson(){
+		var wrongLongJson = '{"menu": {"id": "file","value": "File","popup": {"menuitem": [{"value": "New", "onclick": "CreateNewDoc()"},{"value": "Open", "onclick": "OpenDoc()"},{"value":"Close", "onclick": "CloseDoc()"}]}}}';
+		var wrongShortText = 'asdkjhsakdjhasdkj';
+		var wrongNull = '';
+		if(isValidJiraJson(wrongLongJson) == false && isValidJiraJson(wrongShortText) == false && isValidJiraJson(wrongNull) == false){
+			return true
+		}
+		return false;
+	}
+
+	function testConvertToCSVOK(){
+		var okJson = '["Ford", "BMW", "Fiat"]';
+		var stringCSV = ConvertToCSV(okJson);
+
+		if(stringCSV != null && stringCSV.includes(',')){
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -216,7 +293,7 @@
 			<td>Step 3: Fill in the json</td>
 			<td><textarea id="inputJson" maxlength="16000000"></textarea></td>
 			<td>Or give the link to the json file for large files</td>
-			<td><textarea id="inputJsonFileLocation"></textarea></td>
+			<td><textarea id="inputJsonLinkLocation"></textarea></td>
 		</tr>
 		<tr>
 			<td>Step 4: Get the csv formated for analytics.actionableagile.com</td>
