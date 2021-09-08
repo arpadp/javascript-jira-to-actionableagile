@@ -3,6 +3,8 @@
     <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script>
 
+	//Change this to match the workflow from jira. Note that the strings should be the exact statuses from jira
+	const worklfowSteps = ['Analysis in progress','Waiting for Dev','Dev In Progress','Waiting for Code Review','Code Review In Progress','Dev Done'];
 
     $( document ).ready(function() {
         console.log( "document loaded" );
@@ -16,8 +18,8 @@
 				var request = new XMLHttpRequest();
 				request.open("GET",inputJsonFileLocation, false);
 				request.send(null)
-				var my_JSON_object = JSON.parse(request.responseText);
-				var fromatedObj = formatJson(my_JSON_object);						
+				var linkJsonObj = JSON.parse(request.responseText);
+				var fromatedObj = formatJson(linkJsonObj);						
 				exportCSVFile(fromatedObj.issues,"Data");
 				
 			}else{
@@ -35,38 +37,63 @@
     });
 
 	function formatJson(jsonObj){
-		//this is the place to setup the workflow
-		//it should start with Id, Name, statuses of the issue, Done and Type
-		var skeletonJSON = '{"issues":[{"Id":"Id","Name":"Name", "StartDate":"Analysis in progress","WaitingForDev":"Waiting for dev","DevStarted":"Dev in progress","WaitingForCodeReview":"Waiting for code review","CodeReviewInProgress":"Code review in progress", "DoneDate":"Done", "Type":"Type" }]}';
-		var fromatedObj = JSON.parse(skeletonJSON); 
+		
+		var fromatedObj = JSON.parse(getSkeletonJsonFormated()); 
 		for (var i = 0; i < jsonObj.issues.length; i++){
 			var histories = jsonObj.issues[i].changelog.histories;
 			
+			var id = jsonObj.issues[i].key;
 			var summary = removeCommas(jsonObj.issues[i].fields.summary);
 			var type = removeCommas(jsonObj.issues[i].fields.issuetype.name);
-			
-			var startDate = getDateByStatus(histories,"Analysis In Progress");
-			var devStarted = getDateByStatus(histories,"Dev In Progress");
-			var waitingForDev = getDateByStatus(histories,"Waiting for Dev");
-			var waitingForCodeReview = getDateByStatus(histories,"Waiting for Code Review");
-			var codeReviewInProgress = getDateByStatus(histories,"Code Review In Progress");
-			var endDate = getDateByStatus(histories,"Dev Done");
-			
-			//hacks for having done dates
-			if(endDate == ""){
-				endDate = getDateByStatus(histories,"Waiting for Release");
+
+			var workflowValues = [];
+			for(var j=0;j<worklfowSteps.length;j++){
+				workflowValues.push(getDateByStatus(histories,worklfowSteps[j]));
 			}
-			if(endDate == ""){
-				endDate = getDateByStatus(histories,"Done");
-			}
+
+			var itemToPush = getItemToPush(id,summary,workflowValues,type);
+			fromatedObj['issues'].push(itemToPush);
 			
-			//Need to have dates on the first columns. 
-			if(startDate != "" || devStarted != "") {
-				fromatedObj['issues'].push({"Id":jsonObj.issues[i].key,"Name":summary,"StartDate":startDate,"WaitingForDev":waitingForDev,"DevStarted":devStarted,"WaitingForCodeReview":waitingForCodeReview,"CodeReviewInProgress":codeReviewInProgress,"DoneDate":endDate, "Type":type});
-			}
+			
+			// //hacks for having done dates
+			// if(endDate == ""){
+			// 	endDate = getDateByStatus(histories,"Waiting for Release");
+			// }
+			// if(endDate == ""){
+			// 	endDate = getDateByStatus(histories,"Done");
+			// }
+
 			
 		}
 		return fromatedObj;
+	}
+
+	function getSkeletonJsonFormated(){
+		var skeletonJSON = '{"issues":[{"Id":"Id","Name":"Name", ';
+		
+		for (var i = 0; i < worklfowSteps.length; i++){
+			skeletonJSON = skeletonJSON + '"'+ worklfowSteps[i] +'":"'+ worklfowSteps[i] +'",';
+
+		}
+
+		skeletonJSON = skeletonJSON + '"Type":"Type" }]}';
+
+		return skeletonJSON;
+	}
+
+	function getItemToPush(id,name,workflowStepsValue,type){
+		//The order should be Id Name [Steps] Type
+		var item = {};
+		item["Id"] = id;
+		item["Name"] = name;
+
+		for(var i=0;i<worklfowSteps.length;i++){
+			item[worklfowSteps[i]] = workflowStepsValue[i] ;
+		}
+
+		item["Type"] = type; 
+
+		return item;
 	}
 
 
@@ -139,6 +166,7 @@
 		}
 
 	}
+
 
     </script>
 </head>
