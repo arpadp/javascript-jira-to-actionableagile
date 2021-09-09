@@ -1,5 +1,5 @@
 //Some teams may use dev done status as end date, but people may push directly to done. This helps to have these stories closed as well.
-const overrideDevDoneDateWithDevDateWhenDevDoneDateIsNull = true;
+const overrideDevDoneDateWithDoneDateWhenDevDoneDateIsNull = true;
 
 $(document).ready(function () {
 	console.log("document loaded");
@@ -113,7 +113,7 @@ function getItemToPush(id, name, workflowStepsValue, type, histories) {
 
 	for (var i = 0; i < worklfowSteps.length; i++) {
 
-		if (!overrideDevDoneDateWithDevDateWhenDevDoneDateIsNull) {
+		if (!overrideDevDoneDateWithDoneDateWhenDevDoneDateIsNull) {
 			item[worklfowSteps[i]] = workflowStepsValue[i];
 		} else {
 			if (worklfowSteps[i] == "Dev Done") {
