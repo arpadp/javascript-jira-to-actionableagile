@@ -3,7 +3,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/arpadp/javascript-jira-to-actionableagile">
+  <a href="https://arpadp.github.io/javascript-jira-to-actionableagile/">
     Project site
   </a>
 
