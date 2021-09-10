@@ -13,7 +13,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/arpadp/javascript-jira-to-actionableagile">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    Project site
   </a>
 
   <h3 align="center">Javascript jira to actioableagile </h3>
