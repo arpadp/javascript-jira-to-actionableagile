@@ -56,7 +56,10 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Problem statement:
+If you don't know about https://analytics.actionableagile.com go chek it out. Is a great toll. 
+They also have a jira plugins and are very good and seamless to use. 
+
+Sometimes one can't get the jira plugin, so the problem statement this thing solves is:
 I want to have a data driven approach to view teams flow by using jira as the single point of truth and https://analytics.actionableagile.com to interpret the results. 
 This tool is used to convert a json, from a jira rest api server, to a csv fomratted for analytics.
 
