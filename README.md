@@ -57,7 +57,7 @@
 ## About The Project
 
 Problem statement:
-I want to have a data driven approach on how teams work by using jira as the single point of truth and https://analytics.actionableagile.com to interpret the results. 
+I want to have a data driven approach to view teams flow by using jira as the single point of truth and https://analytics.actionableagile.com to interpret the results. 
 This tool is used to convert a json, from a jira rest api server, to a csv fomratted for analytics.
 
 
