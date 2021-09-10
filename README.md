@@ -141,7 +141,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@ArpadPiskolti](https://twitter.com/ArpadPiskolti) 
+Arpad - Twitter     [@ArpadPiskolti](https://twitter.com/ArpadPiskolti) 
+        Linkedin    [@ArpadPiskolti](https://linkedin.com/in/arpadpiskolti) 
 
 Project Link: [https://github.com/arpadp/javascript-jira-to-actionableagile](https://github.com/arpadp/javascript-jira-to-actionableagile)
 
@@ -171,4 +172,4 @@ Project Link: [https://github.com/arpadp/javascript-jira-to-actionableagile](htt
 [license-shield]: https://img.shields.io/github/license/arpadp/repo.svg?style=for-the-badge
 [license-url]: https://github.com/arpadp/javascript-jira-to-actionableagile/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/arpadp
+[linkedin-url]: https://linkedin.com/in/arpadpiskolti
