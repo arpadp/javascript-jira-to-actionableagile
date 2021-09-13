@@ -56,7 +56,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-If you don't know about https://analytics.actionableagile.com go chek it out. Is a great toll. 
+If you don't know about https://analytics.actionableagile.com go chek it out. It's a great toll. 
 They also have a jira plugins and are very good and seamless to use. 
 
 Sometimes one can't get the jira plugin, so the problem statement this thing solves is:
