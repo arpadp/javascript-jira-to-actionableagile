@@ -9,7 +9,7 @@ $(document).ready(function () {
 
 		var inputJsonLinkLocation = $("#inputJsonLinkLocation").val();
 		var inputJson = $("#inputJson").val();
-		var inputWorkflow = $("#inputWorkflow").val();
+		var inputWorkflow = makeStringToLowerCaseAndWithoutSpaces($("#inputWorkflow").val());
 		var worklfowSteps = getWorkflowSteps(inputWorkflow);
 
 		if (worklfowSteps == null) {
@@ -149,7 +149,7 @@ function removeCommas(str) {
 
 function getDateByStatus(histories, toStatus) {
 	for (var i = 0; i < histories.length; i++) {
-		if (histories[i].items[0].toString == toStatus) {
+		if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[0].toString) == toStatus) {
 			return histories[i].created;
 		}
 	}
@@ -227,8 +227,25 @@ function isValidJson(inputStr) {
 	}
 }
 
+function makeStringToLowerCaseAndWithoutSpaces(inputStr){
+	if(inputStr != null){
+		var goodStr = inputStr.replaceAll(' ','');
+		return goodStr.toLowerCase();
+	}
+	return "";
+	
+}
+
 function runTests() {
 	var result = true;
+	if (!testOKmakeStringToLowerCaseAndWithoutSpaces()) {
+		alert("makeStringToLowerCaseAndWithoutSpaces failed");
+		result = false;
+	}
+	if (!testNullmakeStringToLowerCaseAndWithoutSpaces()) {
+		alert("testNullmakeStringToLowerCaseAndWithoutSpaces failed");
+		result = false;
+	}
 	if (!testOKGetWorkflowSteps()) {
 		alert("getWorkflowStepsTestOk failed");
 		result = false;
@@ -257,6 +274,22 @@ function runTests() {
 		console.log("All tests passed");
 	}
 
+}
+
+function testOKmakeStringToLowerCaseAndWithoutSpaces(){
+	var str = makeStringToLowerCaseAndWithoutSpaces(" Test 123 ");
+	if(str == "test123"){
+		return true;
+	}
+	return false;
+}
+
+function testNullmakeStringToLowerCaseAndWithoutSpaces(){
+	var str = makeStringToLowerCaseAndWithoutSpaces(null);
+	if(str == ""){
+		return true;
+	}
+	return false;
 }
 
 function testOKGetWorkflowSteps() {
