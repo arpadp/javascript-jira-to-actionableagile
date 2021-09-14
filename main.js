@@ -9,7 +9,7 @@ $(document).ready(function () {
 
 		var inputJsonLinkLocation = $("#inputJsonLinkLocation").val();
 		var inputJson = $("#inputJson").val();
-		var inputWorkflow = makeStringToLowerCaseAndWithoutSpaces($("#inputWorkflow").val());
+		var inputWorkflow = $("#inputWorkflow").val();
 		var worklfowSteps = getWorkflowSteps(inputWorkflow);
 
 		if (worklfowSteps == null) {
@@ -149,7 +149,7 @@ function removeCommas(str) {
 
 function getDateByStatus(histories, toStatus) {
 	for (var i = 0; i < histories.length; i++) {
-		if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[0].toString) == toStatus) {
+		if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[0].toString) == makeStringToLowerCaseAndWithoutSpaces(toStatus)) {
 			return histories[i].created;
 		}
 	}
