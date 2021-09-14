@@ -144,7 +144,7 @@ function getItemToPush(id, name, workflowStepsValue, type, histories) {
 
 
 function removeCommas(str) {
-	return str.replace(",", " ");
+	return str.replaceAll(",", " ");
 }
 
 function getDateByStatus(histories, toStatus) {
