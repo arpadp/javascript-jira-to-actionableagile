@@ -149,8 +149,10 @@ function removeCommas(str) {
 
 function getDateByStatus(histories, toStatus) {
 	for (var i = 0; i < histories.length; i++) {
-		if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[0].toString) == makeStringToLowerCaseAndWithoutSpaces(toStatus)) {
-			return histories[i].created;
+		for(var j = 0; j < histories[i].items.length; j++) {
+			if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[j].toString) == makeStringToLowerCaseAndWithoutSpaces(toStatus)) {
+				return histories[i].created;
+			}
 		}
 	}
 	return "";
