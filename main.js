@@ -7,7 +7,6 @@ $(document).ready(function () {
 
 	$("#btnDownload").click(function () {
 
-		var inputJsonLinkLocation = $("#inputJsonLinkLocation").val();
 		var inputJson = $("#inputJson").val();
 		var inputWorkflow = $("#inputWorkflow").val();
 		var worklfowSteps = getWorkflowSteps(inputWorkflow);
@@ -16,31 +15,40 @@ $(document).ready(function () {
 			alert("The workflow is not in the proper format!");
 		}
 
-		if (inputJsonLinkLocation != "") {
-			exportCSVFileFromLink(inputJsonLinkLocation, worklfowSteps);
+		if (inputJson != "") {
+			exportCSVFileFromtexInput(inputJson, worklfowSteps);
 
 		} else {
-			exportCSVFileFromtexInput(inputJson, worklfowSteps);
+			exportCSVFileFromFile(worklfowSteps);
 		}
 
 	});
 });
 
-function exportCSVFileFromLink(inputJsonLinkLocation, worklfowSteps) {
-	var request = new XMLHttpRequest();
-	request.open("GET", inputJsonLinkLocation, false);
-	request.send(null)
-	if (isValidJson(request.responseText)) {
-		var linkJsonObj = JSON.parse(request.responseText);
-		var fromatedObj = formatJson(linkJsonObj, worklfowSteps);
-		exportCSVFile(fromatedObj.issues, "Data");
-	}
-	else {
-		alert("Invalid Json from link");
-	}
+function exportCSVFileFromFile(worklfowSteps) {
+	
+	var myFile = $('#fileinput').prop('files')[0];
+	if(myFile != undefined){
+		var fr=new FileReader();
+		fr.readAsText(myFile);
 
+		fr.onload = function(data) {
+			var text = data.target.result;
+			if (isValidJson(text)) {
+				var linkJsonObj = JSON.parse(text);
+				var fromatedObj = formatJson(linkJsonObj, worklfowSteps);
+				exportCSVFile(fromatedObj.issues, "Data");
+			}
+			else {
+				alert("Invalid Json from file");
+			}
+		}
+	}
+	else{
+		alert("Invalid file");
+	}
+	
 }
-
 function exportCSVFileFromtexInput(inputJson, worklfowSteps) {
 	if (isValidJson(inputJson)) {
 		var jsonObj = jQuery.parseJSON(inputJson);
