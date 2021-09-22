@@ -49,6 +49,7 @@ function exportCSVFileFromFile(worklfowSteps) {
 	}
 	
 }
+
 function exportCSVFileFromtexInput(inputJson, worklfowSteps) {
 	if (isValidJson(inputJson)) {
 		var jsonObj = jQuery.parseJSON(inputJson);
@@ -87,13 +88,14 @@ function formatJson(jsonObj, worklfowSteps) {
 		var id = jsonObj.issues[i].key;
 		var summary = removeCommas(jsonObj.issues[i].fields.summary);
 		var type = removeCommas(jsonObj.issues[i].fields.issuetype.name);
+		var labels = formatLabels(jsonObj.issues[i].fields.labels);
 
 		var workflowValues = [];
 		for (var j = 0; j < worklfowSteps.length; j++) {
 			workflowValues.push(getDateByStatus(histories, worklfowSteps[j]));
 		}
 
-		var itemToPush = getItemToPush(id, summary, workflowValues, type, histories);
+		var itemToPush = getItemToPush(id, summary, workflowValues, type, histories, labels);
 		fromatedObj['issues'].push(itemToPush);
 
 	}
@@ -108,12 +110,12 @@ function getSkeletonJsonFormated() {
 
 	}
 
-	skeletonJSON = skeletonJSON + '"Type":"Type" }]}';
+	skeletonJSON = skeletonJSON + '"Type":"Type","Labels":"Labels" }]}';
 
 	return skeletonJSON;
 }
 
-function getItemToPush(id, name, workflowStepsValue, type, histories) {
+function getItemToPush(id, name, workflowStepsValue, type, histories, labels) {
 	//The order should be Id, Name, [Steps],Type to be accepted by actionableagile
 	var item = {};
 	item["Id"] = id;
@@ -145,6 +147,7 @@ function getItemToPush(id, name, workflowStepsValue, type, histories) {
 	}
 
 	item["Type"] = type;
+	item["Labels"] = labels;
 
 	return item;
 }
@@ -153,6 +156,25 @@ function getItemToPush(id, name, workflowStepsValue, type, histories) {
 
 function removeCommas(str) {
 	return str.replaceAll(",", " ");
+}
+
+function formatLabels(labels){
+	var returnLabelsStr = '';
+	if(labels.length>0){
+		returnLabelsStr = returnLabelsStr +'[';
+		for(var i=0;i<labels.length;i++){
+			if(i==0){
+				returnLabelsStr = returnLabelsStr +removeCommas(labels[i]);	
+			}
+			else{
+				returnLabelsStr = returnLabelsStr + '|' +removeCommas(labels[i]);
+			}
+			
+		}
+		returnLabelsStr = returnLabelsStr +']';
+	}
+	
+	return returnLabelsStr;
 }
 
 function getDateByStatus(histories, toStatus) {
