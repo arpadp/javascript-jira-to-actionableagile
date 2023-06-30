@@ -89,13 +89,14 @@ function formatJson(jsonObj, worklfowSteps) {
 		var summary = removeCommas(jsonObj.issues[i].fields.summary);
 		var type = removeCommas(jsonObj.issues[i].fields.issuetype.name);
 		var labels = formatLabels(jsonObj.issues[i].fields.labels);
+		var blockedDays = getBlockedDays(histories);
 
 		var workflowValues = [];
 		for (var j = 0; j < worklfowSteps.length; j++) {
-			workflowValues.push(getDateByStatus(histories, worklfowSteps[j]));
+			workflowValues.push(getStartDateOfStatus(histories, worklfowSteps[j]));
 		}
 
-		var itemToPush = getItemToPush(id, summary, workflowValues, type, histories, labels);
+		var itemToPush = getItemToPush(id, summary, workflowValues, type, histories,blockedDays,labels);
 		fromatedObj['issues'].push(itemToPush);
 
 	}
@@ -110,12 +111,12 @@ function getSkeletonJsonFormated() {
 
 	}
 
-	skeletonJSON = skeletonJSON + '"Type":"Type","Labels":"Labels" }]}';
+	skeletonJSON = skeletonJSON + '"Type":"Type","BlockedDays":"Blocked Days","Labels":"Labels" }]}';
 
 	return skeletonJSON;
 }
 
-function getItemToPush(id, name, workflowStepsValue, type, histories, labels) {
+function getItemToPush(id, name, workflowStepsValue, type, histories, blockedDays, labels) {
 	//The order should be Id, Name, [Steps],Type to be accepted by actionableagile
 	var item = {};
 	item["Id"] = id;
@@ -129,10 +130,7 @@ function getItemToPush(id, name, workflowStepsValue, type, histories, labels) {
 			if (worklfowSteps[i] == "Dev Done") {
 				var endDate = workflowStepsValue[i];
 				if (endDate == "") {
-					endDate = getDateByStatus(histories, "Waiting for Release");
-				}
-				if (endDate == "") {
-					endDate = getDateByStatus(histories, "Done");
+					endDate = getStartDateOfStatus(histories, "Done");
 				}
 
 				item[worklfowSteps[i]] = endDate;
@@ -147,6 +145,7 @@ function getItemToPush(id, name, workflowStepsValue, type, histories, labels) {
 	}
 
 	item["Type"] = type;
+	item["BlockedDays"] = blockedDays;
 	item["Labels"] = labels;
 
 	return item;
@@ -177,10 +176,42 @@ function formatLabels(labels){
 	return returnLabelsStr;
 }
 
-function getDateByStatus(histories, toStatus) {
+function getBlockedDays(histories){
+
+	var startDateOfBlockedStr = getStartDateOfStatus(histories,"Blocked");
+	if(startDateOfBlockedStr != ""){
+		var startBlockedDate = Date.parse(startDateOfBlockedStr);
+		var endBlockedDate = new Date();
+		var endDateOfBlockedStr = getEndDateOfStatus(histories,"Blocked"); 
+		if(endDateOfBlockedStr != ""){
+			endBlockedDate = Date.parse(endDateOfBlockedStr);	
+		}
+
+		var diffTime = Math.abs(endBlockedDate - startBlockedDate);
+		var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+		return diffDays;
+
+	}
+
+	return 0;
+}
+
+function getStartDateOfStatus(histories, toStatus) {
 	for (var i = 0; i < histories.length; i++) {
 		for(var j = 0; j < histories[i].items.length; j++) {
 			if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[j].toString) == makeStringToLowerCaseAndWithoutSpaces(toStatus)) {
+				return histories[i].created;
+			}
+		}
+	}
+	return "";
+}
+
+function getEndDateOfStatus(histories, toStatus) {
+	for (var i = 0; i < histories.length; i++) {
+		for(var j = 0; j < histories[i].items.length; j++) {
+			if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[j].fromString) == makeStringToLowerCaseAndWithoutSpaces(toStatus)) {
 				return histories[i].created;
 			}
 		}
