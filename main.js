@@ -181,27 +181,28 @@ function formatLabels(labels){
 
 function getBlockedDays(histories){
 
-	var inputBlockedStatuses = $("#inputBlockedStatuses").val();
+	try{
+		var inputBlockedStatuses = $("#inputBlockedStatuses").val();
 
-	if(!inputBlockedStatuses.includes(',')){
-		return getBlockedDaysFromStatus(histories,inputBlockedStatuses);
+		if(!inputBlockedStatuses.includes(',')){
+			return getBlockedDaysFromStatus(histories,inputBlockedStatuses);
+		}
+	
+		var blockedStatuses = inputBlockedStatuses.split(',');
+		var blockedDays = 0;
+	
+		for (var i = 0; i < blockedStatuses.length; i++) {
+			blockedDays = blockedDays + getBlockedDaysFromStatus(histories,blockedStatuses[i]);
+		}
+	
+		return blockedDays;	
 	}
-
-	var blockedStatuses = getWorkflowSteps(inputBlockedStatuses);
-	var blockedDays = 0;
-
-	if (blockedStatuses == null){
-		return blockedDays;
+	catch(e){
+		return 0;
 	}
-
-	for (var i = 0; i < blockedStatuses.length; i++) {
-		blockedDays = blockedDays + getBlockedDaysFromStatus(histories,blockedStatuses[i]);
-	}
-
-	return blockedDays;	
+	
 	
 }
-
 function getBlockedDaysFromStatus(histories,status){
 
 	var startDateOfBlockedStr = getStartDateOfStatus(histories,status);
