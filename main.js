@@ -184,6 +184,10 @@ function getBlockedDays(histories){
 	try{
 		var inputBlockedStatuses = $("#inputBlockedStatuses").val();
 
+		if(isEmptyOrSpaces(inputBlockedStatuses)){
+			return 0;
+		}
+
 		if(!inputBlockedStatuses.includes(',')){
 			return getBlockedDaysFromStatus(histories,inputBlockedStatuses);
 		}
@@ -325,6 +329,10 @@ function makeStringToLowerCaseAndWithoutSpaces(inputStr){
 	}
 	return "";
 	
+}
+
+function isEmptyOrSpaces(str){
+    return str === null || str.match(/^ *$/) !== null;
 }
 
 function runTests() {
