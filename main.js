@@ -207,6 +207,7 @@ function getBlockedDays(histories){
 	
 	
 }
+
 function getBlockedDaysFromStatus(histories,status){
 
 	var startDateOfBlockedStr = getStartDateOfStatus(histories,status);
@@ -215,7 +216,37 @@ function getBlockedDaysFromStatus(histories,status){
 		var endBlockedDate = new Date();
 		var endDateOfBlockedStr = getEndDateOfStatus(histories,status); 
 		if(endDateOfBlockedStr != ""){
-			endBlockedDate = Date.parse(endDateOfBlockedStr);	
+			endBlockedDate = Date.parse(endDateOfBlockedStr);
+			var searchForOtherEntries = true;
+			var diffTimeFromMultipleEntries = Math.abs(endBlockedDate - startBlockedDate);
+			var diffDaysFromMultipleEntries = Math.ceil(diffTimeFromMultipleEntries / (1000 * 60 * 60 * 24)); 
+			var nextStartDateStr = startDateOfBlockedStr;
+			var nextEndDateStr = endDateOfBlockedStr;
+			while(searchForOtherEntries){
+				nextStartDateStr = getStartDateOfStatusWithDate(histories,status,nextStartDateStr);
+				if(nextStartDateStr == ""){
+					searchForOtherEntries = false;
+				}
+				else{
+					nextEndDateStr = getEndDateOfStatusWithDate(histories,status,nextEndDateStr);
+					var startDateToAdd = Date.parse(nextStartDateStr);
+					var endDateToAdd = new Date();
+					if(nextEndDateStr == ""){
+						searchForOtherEntries = false;
+						var diffTimeToAdd = Math.abs(endDateToAdd-startDateToAdd);
+						var diffDaysToAdd = Math.ceil(diffTimeToAdd / (1000 * 60 * 60 * 24));
+						diffDaysFromMultipleEntries += diffDaysToAdd;
+					}
+					else{
+						endDateToAdd = Date.parse(nextEndDateStr);
+						var diffTimeToAdd2 = Math.abs(endDateToAdd-startDateToAdd);
+						var diffDaysToAdd2 = Math.ceil(diffTimeToAdd2 / (1000 * 60 * 60 * 24));
+						diffDaysFromMultipleEntries += diffDaysToAdd2;
+					}
+				}
+			}
+			
+			return diffDaysFromMultipleEntries;
 		}
 
 		var diffTime = Math.abs(endBlockedDate - startBlockedDate);
@@ -228,6 +259,8 @@ function getBlockedDaysFromStatus(histories,status){
 	return 0;
 
 }
+
+
 
 function getStartDateOfStatus(histories, toStatus) {
 	for (var i = 0; i < histories.length; i++) {
@@ -250,6 +283,36 @@ function getEndDateOfStatus(histories, toStatus) {
 	}
 	return "";
 }
+
+function getStartDateOfStatusWithDate(histories, toStatus,startDateStr) {
+	for (var i = 0; i < histories.length; i++) {
+		for(var j = 0; j < histories[i].items.length; j++) {
+			if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[j].toString) == makeStringToLowerCaseAndWithoutSpaces(toStatus)) {
+				var dateFound = Date.parse(histories[i].created)
+				if(dateFound>Date.parse(startDateStr)){
+					return histories[i].created;
+				}
+				
+			}
+		}
+	}
+	return "";
+}
+
+function getEndDateOfStatusWithDate(histories, toStatus,endDateStr) {
+	for (var i = 0; i < histories.length; i++) {
+		for(var j = 0; j < histories[i].items.length; j++) {
+			if (makeStringToLowerCaseAndWithoutSpaces(histories[i].items[j].fromString) == makeStringToLowerCaseAndWithoutSpaces(toStatus)) {
+				var dateFound = Date.parse(histories[i].created)
+				if(dateFound>Date.parse(endDateStr)){
+					return histories[i].created;
+				}
+			}
+		}
+	}
+	return "";
+}
+
 
 function exportCSVFile(jsonObject, fileTitle) {
 
