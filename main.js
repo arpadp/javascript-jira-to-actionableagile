@@ -1,5 +1,5 @@
 //Some teams may use dev done status as end date, but people may push directly to done. This helps to have these stories closed as well.
-const overrideDevDoneDateWithDoneDateWhenDevDoneDateIsNull = true;
+const overrideDevDoneDateWithDoneDateWhenDevDoneDateIsNull = false;
 
 $(document).ready(function () {
 	console.log("document loaded");
@@ -111,7 +111,7 @@ function getSkeletonJsonFormated() {
 
 	}
 
-	skeletonJSON = skeletonJSON + '"Type":"Type","BlockedDays":"Blocked Days","Labels":"Labels" }]}';
+	skeletonJSON = skeletonJSON + '"BlockedDays":"Blocked Days","Blocked":"Blocked","Type":"Type","Labels":"Labels" }]}';
 
 	return skeletonJSON;
 }
@@ -125,7 +125,7 @@ function getItemToPush(id, name, workflowStepsValue, type, histories, blockedDay
 	for (var i = 0; i < worklfowSteps.length; i++) {
 
 		if (!overrideDevDoneDateWithDoneDateWhenDevDoneDateIsNull) {
-			item[worklfowSteps[i]] = workflowStepsValue[i];
+			item[worklfowSteps[i]] = formatDate(workflowStepsValue[i]);
 		} else {
 			if (worklfowSteps[i] == "Dev Done") {
 				var endDate = workflowStepsValue[i];
@@ -136,24 +136,29 @@ function getItemToPush(id, name, workflowStepsValue, type, histories, blockedDay
 					endDate = getStartDateOfStatus(histories, "Done");
 				}
 
-				item[worklfowSteps[i]] = endDate;
+				item[worklfowSteps[i]] = formatDate(endDate);
 
 			}
 			else {
-				item[worklfowSteps[i]] = workflowStepsValue[i];
+				item[worklfowSteps[i]] = formatDate(workflowStepsValue[i]);
 			}
 		}
 
 
 	}
 
-	item["Type"] = type;
 	item["BlockedDays"] = blockedDays;
+	if (blockedDays > 0){
+		item["Blocked"] = "Yes";
+	}
+	else{
+		item["Blocked"] = "No";
+	}
+	item["Type"] = type; 
 	item["Labels"] = labels;
 
 	return item;
 }
-
 
 
 function removeCommas(str) {
@@ -400,6 +405,10 @@ function isEmptyOrSpaces(str){
 
 function runTests() {
 	var result = true;
+	if(!testFormatDate()){
+		alert('testFormatDate failed');
+		result = false;
+	}
 	if (!testOKmakeStringToLowerCaseAndWithoutSpaces()) {
 		alert("makeStringToLowerCaseAndWithoutSpaces failed");
 		result = false;
@@ -436,6 +445,15 @@ function runTests() {
 		console.log("All tests passed");
 	}
 
+}
+
+function testFormatDate(){
+	var str = "2024-06-03T10:53:42.290+0000";
+	var dateFormated = formatDate(str);
+	if (dateFormated == "2024/06/03"){
+		return true;
+	}
+	return false;
 }
 
 function testOKmakeStringToLowerCaseAndWithoutSpaces(){
